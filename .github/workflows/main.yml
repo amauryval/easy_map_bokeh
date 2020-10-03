@@ -36,7 +36,7 @@ jobs:
         export MAMBA_ROOT_PREFIX=~/micromamba
         export MAMBA_EXE=$(pwd)/micromamba
         . $MAMBA_ROOT_PREFIX/etc/profile.d/mamba.sh
-        micromamba env create --file environment.yml
+        micromamba create -y -p --file environment.yml
 
     - name: Run tests
       shell: bash
