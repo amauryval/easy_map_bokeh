@@ -22,8 +22,8 @@ jobs:
     - name: Install MicroMamba
       shell: bash
       run: |
-        curl -Ls https://micromamba.snakepit.net/api/micromamba/osx-64/latest | tar -xvj bin/micromamba
-        ./bin/micromamba shell init -s bash -p ~/bin/micromamba
+        wget -qO- https://micromamba.snakepit.net/api/micromamba/linux-64/latest | tar -xvj bin/micromamba --strip-components=1
+        ./micromamba shell init -s bash -p ~/micromamba
         source ~/.bashrc
 
     - name: Configure conda
