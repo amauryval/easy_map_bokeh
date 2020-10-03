@@ -41,5 +41,8 @@ jobs:
     - name: Run tests
       shell: bash
       run: |
-        micromamba activate activate gdf_2_bokeh
+        export MAMBA_ROOT_PREFIX=~/micromamba
+        export MAMBA_EXE=$(pwd)/micromamba
+        . $MAMBA_ROOT_PREFIX/etc/profile.d/mamba.sh
+        micromamba activate gdf_2_bokeh
         python -m pytest --cov=gdf_2_bokeh --cov-report=xml tests/
