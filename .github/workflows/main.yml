@@ -19,30 +19,42 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: install micromamba
+    - name: Install Miniconda
+      shell: bash
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          wget -qO- https://api.anaconda.org/download/conda-forge/micromamba/0.4.0/linux-64/micromamba-0.4.0-hc2cb875_0.tar.bz2 | tar -xvj bin/micromamba --strip-components=1
-        else
-          wget -qO- https://anaconda.org/conda-forge/micromamba/0.4.0/download/osx-64/micromamba-0.4.0-h8680c10_1.tar.bz2 | tar -xvj bin/micromamba
-          mv bin/micromamba ./micromamba
+        if [[ "${{ runner.os }}" = "Linux" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-Linux-x86_64.sh
+        elif [[ "${{ runner.os }}" = "macOS" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+        elif [[ "${{ runner.os }}" = "Windows" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-Windows-x86_64.exe
         fi
-        ./micromamba shell init -s bash -p ~/micromamba
+        curl -L -o $MINICONDA_FILENAME "https://repo.anaconda.com/miniconda/$MINICONDA_FILENAME"
+        bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
+        rm ${MINICONDA_FILENAME}
+
+    - name: Setup paths
+      shell: bash
+      run: |
+        echo "::add-path::$HOME/miniconda3/bin"
+        echo "::add-path::$HOME/miniconda3/Scripts"
+        if [ "${{ matrix.os }}" != "windows-latest" ]; then
+          echo '::set-env name=CONDA_EXEC::${CONDA}/bin/conda'
+        else
+          echo '::set-env name=CONDA_EXEC::C:\Miniconda\condabin\conda.bat'
+        fi
 
     - name: Configure conda
       env:
         CONDA_REQS: "conda conda-verify"
       run: |
-        export MAMBA_ROOT_PREFIX=~/micromamba
-        export MAMBA_EXE=$(pwd)/micromamba
-        . $MAMBA_ROOT_PREFIX/etc/profile.d/mamba.sh
-        micromamba create -y -p --file environment.yml
+        conda config --set auto_update_conda off
+        conda install --yes --quiet micromamba -c conda-forge
+        micromamba env create --file environment.yml
 
     - name: Run tests
       shell: bash
       run: |
-        export MAMBA_ROOT_PREFIX=~/micromamba
-        export MAMBA_EXE=$(pwd)/micromamba
-        . $MAMBA_ROOT_PREFIX/etc/profile.d/mamba.sh
+        source ~/miniconda3/etc/profile.d/conda.sh
         micromamba activate gdf_2_bokeh
         python -m pytest --cov=gdf_2_bokeh --cov-report=xml tests/
