@@ -50,7 +50,7 @@ jobs:
       run: |
         conda config --set auto_update_conda off
         conda install --yes --quiet micromamba -c conda-forge
-        micromamba env create --file environment.yml
+        micromamba create --file environment.yml
 
     - name: Run tests
       shell: bash
