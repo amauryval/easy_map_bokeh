@@ -45,6 +45,7 @@ jobs:
         fi
 
     - name: Configure conda
+      shell: bash -l {0}
       env:
         CONDA_REQS: "conda conda-verify"
       run: |
