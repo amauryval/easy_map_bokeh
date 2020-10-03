@@ -23,13 +23,13 @@ jobs:
       shell: bash
       run: |
         wget -qO- https://micromamba.snakepit.net/api/micromamba/linux-64/latest | tar -xvj bin/micromamba --strip-components=1
-        ./micromamba shell init -s bash -p ~/micromamba
-        source ~/.bashrc
 
     - name: Configure conda
       env:
         CONDA_REQS: "conda conda-verify"
       run: |
+        ./micromamba shell init -s bash -p ~/micromamba
+        source ~/.bashrc
         micromamba activate
         micromamba env create --file environment.yml
 
