@@ -19,18 +19,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install MicroMamba
-      shell: bash
+    - name: install micromamba
       run: |
-        wget -qO- https://micromamba.snakepit.net/api/micromamba/linux-64/latest | tar -xvj bin/micromamba --strip-components=1
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          wget -qO- https://api.anaconda.org/download/conda-forge/micromamba/0.4.0/linux-64/micromamba-0.4.0-hc2cb875_0.tar.bz2 | tar -xvj bin/micromamba --strip-components=1
+        else
+          wget -qO- https://anaconda.org/conda-forge/micromamba/0.4.0/download/osx-64/micromamba-0.4.0-h8680c10_1.tar.bz2 | tar -xvj bin/micromamba
+          mv bin/micromamba ./micromamba
+        fi
+        ./micromamba shell init -s bash -p ~/micromamba
 
     - name: Configure conda
       env:
         CONDA_REQS: "conda conda-verify"
       run: |
-        ./micromamba shell init -s bash -p ~/micromamba
-        source ~/.bashrc
-        micromamba activate
+        export MAMBA_ROOT_PREFIX=~/micromamba
+        export MAMBA_EXE=$(pwd)/micromamba
+        . $MAMBA_ROOT_PREFIX/etc/profile.d/mamba.sh
         micromamba env create --file environment.yml
 
     - name: Run tests
