@@ -50,13 +50,12 @@ jobs:
         CONDA_REQS: "conda conda-verify"
       run: |
         conda config --set auto_update_conda off
-        conda install --yes --quiet micromamba -c conda-forge
-        micromamba shell init
-        micromamba create --file environment.yml
+        conda install --yes --quiet mamba -c conda-forge
+        mamba create --file environment.yml
 
     - name: Run tests
       shell: bash
       run: |
         source ~/miniconda3/etc/profile.d/conda.sh
-        micromamba activate gdf_2_bokeh
+        mamba activate gdf_2_bokeh
         python -m pytest --cov=gdf_2_bokeh --cov-report=xml tests/
